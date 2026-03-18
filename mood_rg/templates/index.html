@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Mood Detection</title>
+</head>
+<body>
+
+<h1>Live Facial Mood Detection</h1>
+
+<video id="video" width="400" autoplay></video>
+<br><br>
+<button onclick="capture()">Detect Emotion</button>
+
+<h2 id="result"></h2>
+
+<script>
+const video = document.getElementById('video');
+
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(stream => {
+        video.srcObject = stream;
+    });
+
+function capture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0);
+
+    canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('image', blob);
+
+        fetch('/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("result").innerText = data;
+        });
+    }, 'image/jpeg');
+}
+</script>
+
+</body>
+</html>
